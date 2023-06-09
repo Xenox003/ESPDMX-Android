@@ -23,6 +23,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -30,19 +32,35 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.navigation.compose.rememberNavController
 import de.jxdev.espdmx.ui.theme.ESPDMXTheme
+import okhttp3.OkHttpClient
+import okhttp3.Request
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val okHttpClient = OkHttpClient()
+
+        var socketListener: WebSocketListener
+        socketListener = WebSocketListener(liveData)
+
+        val websocketURL = "wss://socketsbay.com/wss/v2/1/demo/"
+        val webSocket = okHttpClient.newWebSocket(Request.Builder().url(websocketURL).build(),socketListener)
+        webSocket.send("test")
+
+
+
+
         setContent {
             ESPDMXTheme {
-                // A surface container using the 'background' color from the theme
+                // A surface container using the 'background' color from the them+e
 
                 Navigation()
-
+                //MyScreen(textLive = liveData)
 
 
                 /*
@@ -78,6 +96,15 @@ class MainActivity : ComponentActivity() {
             )
         }
     }
+}
+
+val liveData = MutableLiveData<String>()
+
+@Composable
+fun MyScreen (textLive: LiveData<String>) {
+    val text: String? by textLive.observeAsState()
+
+    Text (text = "$text")
 }
 
 @Composable

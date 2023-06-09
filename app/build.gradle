@@ -65,7 +65,11 @@ dependencies {
     debugImplementation 'androidx.compose.ui:ui-tooling'
     debugImplementation 'androidx.compose.ui:ui-test-manifest'
 
+    implementation "androidx.compose.runtime:runtime-livedata"
+
     def nav_version = "2.5.3"
 
     implementation("androidx.navigation:navigation-compose:$nav_version")
+
+    implementation("com.squareup.okhttp3:okhttp:4.10.0")
 }
