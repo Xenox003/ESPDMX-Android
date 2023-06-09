@@ -33,10 +33,12 @@ import androidx.navigation.NavController
 import de.jxdev.espdmx.MainActivity
 import de.jxdev.espdmx.model.DiscoveredDevice
 import de.jxdev.espdmx.utils.ServiceDiscoveryManager
+import de.jxdev.espdmx.utils.WebsocketManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.koin.compose.koinInject
 import kotlin.coroutines.CoroutineContext
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -88,29 +90,35 @@ fun ConnectionScreen(navController: NavController, context: Context) {
                     .verticalScroll(rememberScrollState())
             ) {
                 serviceList?.forEach { device ->
-                    DevicePanel(context = context, device = device)
+                    DevicePanel(context = context, navController = navController, device = device)
                 }
-                /*
-                DevicePanel(context = context, device = DiscoveredDevice(name = "lol", host = null))
-                DevicePanel(context = context, device = DiscoveredDevice(name = "lol", host = null))
-                DevicePanel(context = context, device = DiscoveredDevice(name = "lol", host = null))
-                DevicePanel(context = context, device = DiscoveredDevice(name = "lol", host = null))
-                DevicePanel(context = context, device = DiscoveredDevice(name = "lol", host = null))
-                DevicePanel(context = context, device = DiscoveredDevice(name = "lol", host = null))
-                DevicePanel(context = context, device = DiscoveredDevice(name = "lol", host = null))
-                */
             }
         }
     }
 }
 
 @Composable
-fun DevicePanel(context: Context, device: DiscoveredDevice) {
+fun DevicePanel(context: Context, navController: NavController, device: DiscoveredDevice) {
+    val coroutineScope = rememberCoroutineScope()
+
+    val socketManager = koinInject<WebsocketManager>()
+
     Box(modifier = Modifier
         .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(2.dp))
         .fillMaxWidth()
         .clickable {
             Log.d("TEST", "Device ${device.name} clicked!")
+            socketManager.setAddress(device.host!!)
+            socketManager.connect()
+            coroutineScope.launch {
+                delay(1000)
+                socketManager.socket?.send("r")
+                delay(1000)
+                socketManager.socket?.send("g")
+                delay(1000)
+                socketManager.socket?.send("b")
+
+            }
         }
     ) {
         Column(modifier =
