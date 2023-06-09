@@ -1,5 +1,7 @@
 package de.jxdev.espdmx
 
+import android.content.Context
+import android.net.nsd.NsdManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -44,6 +46,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         val okHttpClient = OkHttpClient()
+        val nsdManager = getSystemService(Context.NSD_SERVICE) as NsdManager
 
         var socketListener: WebSocketListener
         socketListener = WebSocketListener(liveData)
@@ -59,7 +62,7 @@ class MainActivity : ComponentActivity() {
             ESPDMXTheme {
                 // A surface container using the 'background' color from the them+e
 
-                Navigation()
+                Navigation(this)
                 //MyScreen(textLive = liveData)
 
 

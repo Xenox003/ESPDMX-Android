@@ -1,5 +1,7 @@
 package de.jxdev.espdmx.screen
 
+import android.content.Context
+import android.net.nsd.NsdManager
 import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,7 +13,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -23,14 +24,17 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import de.jxdev.espdmx.utils.ServiceDiscoveryManager
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ConnectionScreen(navController: NavController) {
+fun ConnectionScreen(navController: NavController, context: Context) {
     var text by remember {
         mutableStateOf("")
     }
+    val discoveryManager = ServiceDiscoveryManager(context)
+    discoveryManager.startDiscovery()
 
 
     Box(

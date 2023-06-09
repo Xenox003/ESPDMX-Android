@@ -1,5 +1,6 @@
 package de.jxdev.espdmx
 
+import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,11 +30,11 @@ import androidx.navigation.navArgument
 import de.jxdev.espdmx.screen.ConnectionScreen
 
 @Composable
-fun Navigation () {
+fun Navigation (context: Context) {
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = Screen.ConnectionScreen.route) {
         composable(route = Screen.ConnectionScreen.route) {
-            ConnectionScreen(navController = navController)
+            ConnectionScreen(navController = navController, context = context)
         }
         composable(
             route = Screen.MainScreen.route + "/{name}",
