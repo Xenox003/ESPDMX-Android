@@ -3,7 +3,6 @@ package de.jxdev.espdmx.utils
 import android.content.Context
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
-import de.jxdev.espdmx.model.DiscoveredDevice
 import de.jxdev.espdmx.model.WebsocketStatus
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -24,9 +23,6 @@ class WebsocketManager (context : Context) {
     private val socketListener = WebSocketListener(this)
     var socket : WebSocket? = null
     val liveStatus = MutableLiveData<WebsocketStatus>(socketListener.status)
-
-    val id = UUID.randomUUID().toString()
-
     fun setAddress(address: InetAddress) {
         socketAddress = address
         socketUrl = "ws://${socketAddress?.hostAddress.toString()}/ws"
@@ -71,11 +67,7 @@ class WebSocketListener (private val socketManager: WebsocketManager) : WebSocke
         super.onMessage(webSocket, text)
         Log.d(logTag, "onMessage: $text")
 
-        Log.d("TEST", socketManager.id)
-
-        if (text == "ALIVE") {
-            status.lastAliveTick = System.currentTimeMillis()
-        }
+        status.lastAliveTick = System.currentTimeMillis()
     }
 
     override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
