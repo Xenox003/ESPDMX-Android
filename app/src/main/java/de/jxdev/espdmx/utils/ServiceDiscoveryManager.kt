@@ -6,6 +6,7 @@ import android.net.nsd.NsdServiceInfo
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import de.jxdev.espdmx.model.DiscoveredDevice
+import java.lang.Exception
 import java.net.InetAddress
 
 class ServiceDiscoveryManager (context: Context) {
@@ -13,36 +14,20 @@ class ServiceDiscoveryManager (context: Context) {
     private val SERVICETYPE = "_espdmx._tcp"
     private val nsdManager = context.getSystemService(Context.NSD_SERVICE) as NsdManager
     private val serviceList: MutableList<DiscoveredDevice> = mutableListOf()
+    private var discoveryRunning = false
 
     public val liveData = MutableLiveData<MutableList<DiscoveredDevice>>()
 
     private fun addToServiceList(discoveredDevice: DiscoveredDevice) {
         serviceList.add(discoveredDevice)
-        liveData.postValue(serviceList)
+        updateServiceListLive()
     }
     private fun removeFromServiceList(discoveredDevice: DiscoveredDevice) {
         serviceList.remove(discoveredDevice)
-        liveData.postValue(serviceList)
+        updateServiceListLive()
     }
-
-    private val resolveListener = object : NsdManager.ResolveListener {
-
-        override fun onResolveFailed(serviceInfo: NsdServiceInfo, errorCode: Int) {
-            // Called when the resolve fails. Use the error code to debug.
-            Log.e(LOGTAG, "Resolve failed: $errorCode")
-        }
-
-        override fun onServiceResolved(serviceInfo: NsdServiceInfo) {
-            Log.e(LOGTAG, "Resolve Succeeded. $serviceInfo")
-
-            /*
-            if (serviceInfo.serviceName == mServiceName) {
-                Log.d(LOGTAG, "Same IP.")
-                return
-            }*/
-            val port: Int = serviceInfo.port
-            val host: InetAddress = serviceInfo.host
-        }
+    private fun updateServiceListLive() {
+        liveData.postValue(serviceList)
     }
 
     public val discoveryListener = object : NsdManager.DiscoveryListener {
@@ -55,16 +40,30 @@ class ServiceDiscoveryManager (context: Context) {
         override fun onServiceFound(service: NsdServiceInfo) {
             // A service was found! Do something with it.
             Log.d(LOGTAG, "Service discovery success$service")
-            /*
-            when {
-                service.serviceType != SERVICE_TYPE -> // Service type is the string containing the protocol and
-                    // transport layer for this service.
-                    Log.d(TAG, "Unknown Service Type: ${service.serviceType}")
-                service.serviceName == mServiceName -> // The name of the service tells the user what they'd be
-                    // connecting to. It could be "Bob's Chat App".
-                    Log.d(TAG, "Same machine: $mServiceName")
-                service.serviceName.contains("NsdChat") -> nsdManager.resolveService(service, resolveListener)
-            }*/
+
+            val resolveListener = object : NsdManager.ResolveListener {
+
+                override fun onResolveFailed(serviceInfo: NsdServiceInfo, errorCode: Int) {
+                    // Called when the resolve fails. Use the error code to debug.
+                    Log.e(LOGTAG, "Resolve failed: $errorCode")
+                }
+
+                override fun onServiceResolved(serviceInfo: NsdServiceInfo) {
+                    Log.d(LOGTAG, "Resolve Succeeded. $serviceInfo")
+
+                    if (serviceInfo.host.isReachable(2000)) {
+                        addToServiceList(
+                            DiscoveredDevice(
+                                name = serviceInfo.serviceName,
+                                type = serviceInfo.serviceType,
+                                host = serviceInfo.host,
+                                port = serviceInfo.port
+                            )
+                        )
+                    }
+                }
+            }
+
             nsdManager.resolveService(service,resolveListener)
         }
 
@@ -76,23 +75,43 @@ class ServiceDiscoveryManager (context: Context) {
 
         override fun onDiscoveryStopped(serviceType: String) {
             Log.i(LOGTAG, "Discovery stopped: $serviceType")
+            startDiscovery()
         }
 
         override fun onStartDiscoveryFailed(serviceType: String, errorCode: Int) {
             Log.e(LOGTAG, "Discovery failed: Error code:$errorCode")
-            nsdManager.stopServiceDiscovery(this)
+            try {
+                nsdManager.stopServiceDiscovery(this)
+            } catch (e: Exception) {
+                Log.e(LOGTAG, "Failed to Stop DiscoveryListener: ${e.message}")
+            }
+
         }
 
         override fun onStopDiscoveryFailed(serviceType: String, errorCode: Int) {
             Log.e(LOGTAG, "Discovery failed: Error code:$errorCode")
-            nsdManager.stopServiceDiscovery(this)
+            try {
+                nsdManager.stopServiceDiscovery(this)
+            } catch (e: Exception) {
+                Log.e(LOGTAG, "Failed to Stop DiscoveryListener: ${e.message}")
+            }
         }
     }
 
     public fun startDiscovery() {
+        serviceList.clear()
+        updateServiceListLive()
         nsdManager.discoverServices(SERVICETYPE, NsdManager.PROTOCOL_DNS_SD, discoveryListener)
     }
     public fun stopDiscovery() {
-        nsdManager.stopServiceDiscovery(discoveryListener)
+        try {
+            nsdManager.stopServiceDiscovery(discoveryListener)
+        } catch (e: Exception) {
+            Log.e(LOGTAG, "Failed to Stop DiscoveryListener: ${e.message}")
+        }
+    }
+
+    init {
+        this.startDiscovery()
     }
 }

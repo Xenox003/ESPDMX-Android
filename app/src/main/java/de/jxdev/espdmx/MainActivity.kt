@@ -1,5 +1,6 @@
 package de.jxdev.espdmx
 
+import android.app.Service
 import android.content.Context
 import android.net.nsd.NsdManager
 import android.os.Build
@@ -20,6 +21,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -38,10 +40,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.navigation.compose.rememberNavController
 import de.jxdev.espdmx.ui.theme.ESPDMXTheme
+import de.jxdev.espdmx.utils.ServiceDiscoveryManager
 import okhttp3.OkHttpClient
 import okhttp3.Request
 
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -56,13 +60,18 @@ class MainActivity : ComponentActivity() {
         webSocket.send("test")
 
 
-
-
         setContent {
             ESPDMXTheme {
                 // A surface container using the 'background' color from the them+e
 
-                Navigation(this)
+                Surface (
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    Navigation(this)
+                }
+
+
                 //MyScreen(textLive = liveData)
 
 
