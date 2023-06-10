@@ -31,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import de.jxdev.espdmx.MainActivity
+import de.jxdev.espdmx.Screen
 import de.jxdev.espdmx.model.DiscoveredDevice
 import de.jxdev.espdmx.utils.ServiceDiscoveryManager
 import de.jxdev.espdmx.utils.WebsocketManager
@@ -107,7 +108,7 @@ fun DevicePanel(context: Context, navController: NavController, device: Discover
         .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(2.dp))
         .fillMaxWidth()
         .clickable {
-            Log.d("TEST", "Device ${device.name} clicked!")
+            navController.navigate(Screen.MainScreen.route)
             socketManager.setAddress(device.host!!)
             socketManager.connect()
             coroutineScope.launch {
@@ -117,7 +118,6 @@ fun DevicePanel(context: Context, navController: NavController, device: Discover
                 socketManager.socket?.send("g")
                 delay(1000)
                 socketManager.socket?.send("b")
-
             }
         }
     ) {

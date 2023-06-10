@@ -3,7 +3,6 @@ package de.jxdev.espdmx.utils
 import android.content.Context
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
-import de.jxdev.espdmx.model.WebsocketStatus
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
@@ -12,7 +11,6 @@ import okhttp3.WebSocketListener
 import java.net.InetAddress
 import java.util.Timer
 import java.util.TimerTask
-import java.util.UUID
 
 class WebsocketManager (context : Context) {
     private val logTag = "WebsocketListener"
@@ -20,9 +18,8 @@ class WebsocketManager (context : Context) {
     private val client = OkHttpClient()
     private var socketAddress : InetAddress? = null
     private var socketUrl : String? = null
-    private val socketListener = WebSocketListener(this)
+    val socketListener = WebSocketListener(this)
     var socket : WebSocket? = null
-    val liveStatus = MutableLiveData<WebsocketStatus>(socketListener.status)
     fun setAddress(address: InetAddress) {
         socketAddress = address
         socketUrl = "ws://${socketAddress?.hostAddress.toString()}/ws"
@@ -33,10 +30,12 @@ class WebsocketManager (context : Context) {
             Log.e(logTag,"Cannot Connect to WebSocket, address not set!")
             return
         }
-        if (socketListener.status.isConnected) {
+        /*
+        if (socketListener.getIsConnected()) {
             Log.e(logTag, "Cannot Connect to WebSocket, already connected!")
             return
         }
+        */
 
         socket?.close(1000, "Disconnect")
         socket = client.newWebSocket(Request.Builder().url(socketUrl!!).build(),socketListener)
@@ -54,20 +53,29 @@ class WebsocketManager (context : Context) {
 
 class WebSocketListener (private val socketManager: WebsocketManager) : WebSocketListener(){
     private val logTag = "WebsocketListener"
-    var status = WebsocketStatus()
+    var isConnectedLive = MutableLiveData<Boolean>(false)
+    var isAlive = false
+    var lastAliveTick : Long = 0
+
+    private fun setIsConnected(isConnected : Boolean) {
+        isConnectedLive.postValue(isConnected)
+    }
+    fun getIsConnected() : Boolean {
+        return isConnectedLive.value ?: false
+    }
 
     override fun onOpen(webSocket: WebSocket, response: Response) {
         super.onOpen(webSocket, response)
         Log.d(logTag, "onOpen:")
 
-        status.isConnected = true
+        setIsConnected(true)
     }
 
     override fun onMessage(webSocket: WebSocket, text: String) {
         super.onMessage(webSocket, text)
         Log.d(logTag, "onMessage: $text")
 
-        status.lastAliveTick = System.currentTimeMillis()
+        lastAliveTick = System.currentTimeMillis()
     }
 
     override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
@@ -79,20 +87,23 @@ class WebSocketListener (private val socketManager: WebsocketManager) : WebSocke
         super.onClosed(webSocket, code, reason)
         Log.d(logTag, "onClosed: $code $reason")
 
-        status.isConnected = false
+
+        setIsConnected(false)
 
         // Attempt reconnect when error
         if (code != 1000 && reason != "Disconnect") {
             Log.e(logTag, "Websocket Connect closed unexpectedly, reconnecting...")
             socketManager.connect()
         }
+
     }
 
     override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
         Log.e(logTag, "onFailure: ${t.message} $response")
         super.onFailure(webSocket, t, response)
 
-        status.isConnected = false
+
+        setIsConnected(false)
 
         // Attempt reconnect when error
         Log.e(logTag, "Websocket FAIL ${t.message} $response, reconnecting...")
@@ -101,21 +112,21 @@ class WebSocketListener (private val socketManager: WebsocketManager) : WebSocke
     }
 
     private fun updateAliveStatus() {
-        status.isAlive = System.currentTimeMillis() - status.lastAliveTick < 2000
+        isAlive = System.currentTimeMillis() - lastAliveTick < 2000
     }
 
     init {
         Timer().scheduleAtFixedRate(object : TimerTask() {
             override fun run() {
-                val oldAliveStatus = status.isAlive
+                val oldAliveStatus = isAlive
                 updateAliveStatus()
 
-                if (oldAliveStatus != status.isAlive) {
-                    Log.d(logTag,"Alive Status changed to ${status.isAlive}")
+                if (oldAliveStatus != isAlive) {
+                    Log.d(logTag,"Alive Status changed to $isAlive")
 
-                    if (!status.isAlive) {
+                    if (!isAlive) {
                         Log.e(logTag, "Websocket ALIVE signal failure, Attempting Reconnect...")
-                        status.isConnected = false
+                        setIsConnected(false)
                         socketManager.connect()
                     }
                 }
