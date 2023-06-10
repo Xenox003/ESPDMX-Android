@@ -1,5 +1,6 @@
 package de.jxdev.espdmx.components
 
+import android.util.Log
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
@@ -33,6 +34,7 @@ fun MainTopbar () {
     val socketManager = koinInject<WebsocketManager>();
     val socketIsConnected by socketManager.socketListener.isConnectedLive.observeAsState()
     var programmingMode by remember { mutableStateOf(false) }
+    var connectionStatusDialogVisible by remember { mutableStateOf(false) }
 
     val flashAnimation by rememberInfiniteTransition().animateFloat(
         initialValue = 1f,
@@ -61,7 +63,7 @@ fun MainTopbar () {
             modifier = Modifier
                 .padding(5.dp)
                 .clickable () {
-
+                    connectionStatusDialogVisible = !connectionStatusDialogVisible
                 },
             text = statusText,
             color = statusColor,
@@ -82,5 +84,13 @@ fun MainTopbar () {
             text = "Program"
         ) {}
 
+    }
+
+    if (connectionStatusDialogVisible) {
+        ConnectionStatusDialog (
+            setShowDialog = {
+                connectionStatusDialogVisible = it
+            }
+        )
     }
 }

@@ -49,8 +49,6 @@ fun MainScreen (navController: NavController, context : Context) {
             .fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        ConnectionStatusDialog () {}
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
