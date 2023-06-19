@@ -1,86 +1,60 @@
 package de.jxdev.espdmx
 
-import android.content.Context
-import android.net.nsd.NsdManager
+import android.annotation.SuppressLint
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.PowerManager
+import android.provider.Settings
 import android.util.Log
 import android.view.WindowInsets
 import android.view.WindowInsetsController
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.annotation.RequiresApi
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.draggable
-import androidx.compose.foundation.gestures.scrollable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.navigation.compose.rememberNavController
 import de.jxdev.espdmx.ui.theme.ESPDMXTheme
-import okhttp3.OkHttpClient
-import okhttp3.Request
+import de.jxdev.espdmx.utils.ServiceDiscoveryManager
+import de.jxdev.espdmx.utils.WebsocketManager
+import org.koin.android.ext.koin.androidContext
+import org.koin.android.ext.koin.androidLogger
+import org.koin.core.context.startKoin
+import org.koin.dsl.module
+
+
+val appModule = module {
+    single { ServiceDiscoveryManager(this.androidContext() ) }
+    single { WebsocketManager(this.androidContext()) }
+}
 
 class MainActivity : ComponentActivity() {
+
+    @SuppressLint("BatteryLife")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val okHttpClient = OkHttpClient()
-        val nsdManager = getSystemService(Context.NSD_SERVICE) as NsdManager
+        startKoin {
+            androidLogger()
+            androidContext(this@MainActivity)
+            modules(appModule)
+        }
 
-        var socketListener: WebSocketListener
-        socketListener = WebSocketListener(liveData)
-
-        val websocketURL = "wss://socketsbay.com/wss/v2/1/demo/"
-        val webSocket = okHttpClient.newWebSocket(Request.Builder().url(websocketURL).build(),socketListener)
-        webSocket.send("test")
-
-
-
+        Log.d("TEST","onCreate")
 
         setContent {
             ESPDMXTheme {
                 // A surface container using the 'background' color from the them+e
 
-                Navigation(this)
-                //MyScreen(textLive = liveData)
-
-
-                /*
-                Surface(
-                    modifier = Modifier
-                        .fillMaxSize(),
+                Surface (
+                    modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
-
                 ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Greeting("Android", modifier = Modifier
-                            .clickable {
-                                Log.d("yeet","lol")
-                            })
-                    }
+                    Navigation(this)
                 }
-                */
             }
         }
 
@@ -93,35 +67,52 @@ class MainActivity : ComponentActivity() {
             window.insetsController?.hide(WindowInsets.Type.navigationBars())
             window.insetsController?.systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         } else {
+
+            @Suppress("DEPRECATION")
             window.setFlags(
                 WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN
             )
         }
+
+        // Disable Battery Optimisation
+        val intent = Intent()
+        val packageName = packageName
+        val pm = getSystemService(POWER_SERVICE) as PowerManager
+        if (!pm.isIgnoringBatteryOptimizations(packageName)) {
+            intent.action = Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
+            intent.data = Uri.parse("package:$packageName")
+            startActivity(intent)
+        }
     }
-}
 
-val liveData = MutableLiveData<String>()
+    override fun onStart() {
+        super.onStart()
 
-@Composable
-fun MyScreen (textLive: LiveData<String>) {
-    val text: String? by textLive.observeAsState()
+        Log.d("TEST","onStart")
+    }
 
-    Text (text = "$text")
-}
+    override fun onResume() {
+        super.onResume()
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier,
-        fontSize = 30.sp
-    )
-}
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    ESPDMXTheme {
-        Greeting("Android")
+        Log.d("TEST","onResume")
+    }
+
+    override fun onPause() {
+        super.onPause()
+
+        Log.d("TEST","onPause")
+    }
+
+    override fun onStop() {
+        super.onStop()
+
+        Log.d("TEST","onStop")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        Log.d("TEST","onDestroy")
     }
 }
