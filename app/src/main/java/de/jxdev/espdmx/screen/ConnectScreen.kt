@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import de.jxdev.espdmx.MainActivity
 import de.jxdev.espdmx.Screen
+import de.jxdev.espdmx.components.WebsocketLogWindow
 import de.jxdev.espdmx.model.DiscoveredDevice
 import de.jxdev.espdmx.utils.ServiceDiscoveryManager
 import de.jxdev.espdmx.utils.WebsocketManager
@@ -75,6 +76,17 @@ fun ConnectionScreen(navController: NavController, context: Context) {
             enabled = buttonActive
         ) {
             Text(text = "Refresh")
+        }
+        Box (
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .clickable {
+                    Log.d("TEST", "Demo Mode")
+                    navController.navigate(Screen.MainScreen.route)
+                },
+            contentAlignment = Alignment.Center
+        ) {
+            Text(text = "Demo Mode")
         }
         Column (
             modifier = Modifier
