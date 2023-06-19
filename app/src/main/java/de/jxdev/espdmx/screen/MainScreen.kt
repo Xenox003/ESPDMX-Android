@@ -61,7 +61,7 @@ fun MainScreen (navController: NavController, context : Context) {
                     .background(MaterialTheme.colorScheme.surfaceVariant)
             ) {
                 // TOPBAR
-                MainTopbar()
+                MainTopbar(context)
             }
 
         }

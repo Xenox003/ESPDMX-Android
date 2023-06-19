@@ -1,5 +1,6 @@
 package de.jxdev.espdmx.components
 
+import android.content.Context
 import android.util.Log
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -30,7 +31,7 @@ import de.jxdev.espdmx.utils.WebsocketManager
 import org.koin.compose.koinInject
 
 @Composable
-fun MainTopbar () {
+fun MainTopbar (context : Context) {
     val socketManager = koinInject<WebsocketManager>();
     val socketIsConnected by socketManager.socketListener.isConnectedLive.observeAsState()
     var programmingMode by remember { mutableStateOf(false) }
@@ -90,7 +91,8 @@ fun MainTopbar () {
         ConnectionStatusDialog (
             setShowDialog = {
                 connectionStatusDialogVisible = it
-            }
+            },
+            context = context
         )
     }
 }

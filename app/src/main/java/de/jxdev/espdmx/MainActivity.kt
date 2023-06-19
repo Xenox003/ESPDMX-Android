@@ -66,6 +66,8 @@ class MainActivity : ComponentActivity() {
             window.insetsController?.hide(WindowInsets.Type.statusBars())
             window.insetsController?.hide(WindowInsets.Type.navigationBars())
             window.insetsController?.systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+
+            window.setDecorFitsSystemWindows(false)
         } else {
 
             @Suppress("DEPRECATION")
