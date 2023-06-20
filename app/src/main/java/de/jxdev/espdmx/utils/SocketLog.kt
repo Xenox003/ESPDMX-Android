@@ -2,18 +2,16 @@ package de.jxdev.espdmx.utils
 
 import android.content.Context
 import android.util.Log
+import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import java.time.LocalDateTime
 
 class SocketLog {
-    private val logList : MutableList<SocketLogEntry> = mutableListOf()
-    val liveLog: LiveData<MutableList<SocketLogEntry>> = MutableLiveData<MutableList<SocketLogEntry>>()
+    val logList = mutableStateListOf<SocketLogEntry>()
 
     fun log (msg : String) {
         logList.add(SocketLogEntry(msg))
-        liveLog.setValue(logList)
-        Log.d("Te",liveLog.toString())
     }
 
 }

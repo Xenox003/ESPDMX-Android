@@ -120,7 +120,7 @@ fun WebsocketLogWindow (modifier: Modifier = Modifier) {
     val coroutineScope = rememberCoroutineScope()
 
     val socketManager = koinInject<WebsocketManager>()
-    val socketLogs : MutableList<SocketLogEntry>? by socketManager.socketLog.liveLog.observeAsState()
+    val socketLogs = socketManager.socketLog.logList
 
     Column(modifier = modifier) {
         Text(
@@ -140,11 +140,11 @@ fun WebsocketLogWindow (modifier: Modifier = Modifier) {
                     .fillMaxSize()
 
             ) {
-                itemsIndexed(socketLogs?.toList() ?: listOf()) { _, entry ->
+                itemsIndexed(socketLogs?.toList()?.reversed() ?: listOf()) { _, entry ->
                     WebsocketLogEntry(text = "${entry.timestamp.toString()} ${entry.msg}")
                 }
             }
-            if (listState.firstVisibleItemIndex > 5) {
+            if (listState.firstVisibleItemIndex > 1) {
                 Box(
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
