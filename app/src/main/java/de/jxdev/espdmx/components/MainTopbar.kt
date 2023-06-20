@@ -31,7 +31,7 @@ import org.koin.compose.koinInject
 
 @Composable
 fun MainTopbar (context : Context) {
-    val socketManager = koinInject<WebsocketManager>();
+    val socketManager = koinInject<WebsocketManager>()
     val socketIsConnected by socketManager.socketListener.isConnectedLive.observeAsState()
     var programmingMode by remember { mutableStateOf(false) }
     var connectionStatusDialogVisible by remember { mutableStateOf(false) }
@@ -62,7 +62,7 @@ fun MainTopbar (context : Context) {
         Text(
             modifier = Modifier
                 .padding(5.dp)
-                .clickable () {
+                .clickable {
                     connectionStatusDialogVisible = !connectionStatusDialogVisible
                 },
             text = statusText,

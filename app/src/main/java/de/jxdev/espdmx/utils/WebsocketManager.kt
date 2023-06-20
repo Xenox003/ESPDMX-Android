@@ -53,9 +53,9 @@ class WebsocketManager (context : Context) {
 
 class WebSocketListener (private val socketManager: WebsocketManager) : WebSocketListener(){
     private val logTag = "WebsocketListener"
-    var isConnectedLive = MutableLiveData<Boolean>(false)
+    var isConnectedLive = MutableLiveData(false)
     var isAlive = false
-    var lastAliveTick : Long = 0
+    private var lastAliveTick : Long = 0
 
     private fun setIsConnected(isConnected : Boolean) {
         isConnectedLive.postValue(isConnected)
