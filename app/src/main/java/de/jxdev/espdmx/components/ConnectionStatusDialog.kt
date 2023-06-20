@@ -1,6 +1,8 @@
 package de.jxdev.espdmx.components
 
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -16,6 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -25,6 +28,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -37,11 +43,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.navigation.NavController
+import de.jxdev.espdmx.Screen
+import de.jxdev.espdmx.utils.SocketLog
+import de.jxdev.espdmx.utils.SocketLogEntry
+import de.jxdev.espdmx.utils.WebsocketManager
 import kotlinx.coroutines.launch
+import org.koin.compose.koinInject
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun ConnectionStatusDialog (setShowDialog: (Boolean) -> Unit) {
+fun ConnectionStatusDialog (setShowDialog: (Boolean) -> Unit, navController: NavController) {
 
 
     Dialog(
@@ -92,7 +104,9 @@ fun ConnectionStatusDialog (setShowDialog: (Boolean) -> Unit) {
                     ActionWindow(
                         modifier = Modifier
                             .padding(start = 5.dp)
-                            .fillMaxWidth()
+                            .fillMaxWidth(),
+                        navController = navController,
+                        setShowDialog = setShowDialog
                     )
                 }
             }
@@ -104,6 +118,9 @@ fun ConnectionStatusDialog (setShowDialog: (Boolean) -> Unit) {
 fun WebsocketLogWindow (modifier: Modifier = Modifier) {
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
+
+    val socketManager = koinInject<WebsocketManager>()
+    val socketLogs : MutableList<SocketLogEntry>? by socketManager.socketLog.liveLog.observeAsState()
 
     Column(modifier = modifier) {
         Text(
@@ -123,8 +140,8 @@ fun WebsocketLogWindow (modifier: Modifier = Modifier) {
                     .fillMaxSize()
 
             ) {
-                items(40) {
-                    WebsocketLogEntry(text = "test test a b c d e f  g  d s a sd  f ew e dfefeq w efwe q s df  ef g rgwer wq ds reqf ef ewe ")
+                itemsIndexed(socketLogs?.toList() ?: listOf()) { _, entry ->
+                    WebsocketLogEntry(text = "${entry.timestamp.toString()} ${entry.msg}")
                 }
             }
             if (listState.firstVisibleItemIndex > 5) {
@@ -139,7 +156,7 @@ fun WebsocketLogWindow (modifier: Modifier = Modifier) {
                         .background(MaterialTheme.colorScheme.surfaceVariant)
                         .clickable {
                             coroutineScope.launch {
-                                listState.scrollToItem(0)
+                                listState.animateScrollToItem(0)
                             }
                         },
                     contentAlignment = Alignment.Center
@@ -164,7 +181,9 @@ fun WebsocketLogEntry (text : String) {
 
 
 @Composable
-fun ActionWindow (modifier: Modifier = Modifier) {
+fun ActionWindow (modifier: Modifier = Modifier, navController: NavController, setShowDialog: (Boolean) -> Unit) {
+    val socketManager = koinInject<WebsocketManager>()
+
     Column (
         modifier = modifier
     ) {
@@ -175,9 +194,16 @@ fun ActionWindow (modifier: Modifier = Modifier) {
         )
         ActionButton (
             onClick = {
-                Log.d("TEST", "Test Action")
+                setShowDialog(false)
+                navController.navigate(Screen.ConnectionScreen.route)
             },
-            text = "Test Action"
+            text = "To Connection Screen"
+        )
+        ActionButton (
+            onClick = {
+                socketManager.connect()
+            },
+            text = "Reconnect Socket"
         )
     }
 }
@@ -186,6 +212,7 @@ fun ActionWindow (modifier: Modifier = Modifier) {
 fun ActionButton (onClick: () -> Unit,text: String, modifier: Modifier = Modifier) {
     Box (
         modifier = modifier
+            .padding(bottom = 5.dp)
             .background(Color.Gray)
             .fillMaxWidth()
             .height(50.dp)

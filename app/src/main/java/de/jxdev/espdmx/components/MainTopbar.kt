@@ -26,11 +26,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import de.jxdev.espdmx.utils.WebsocketManager
 import org.koin.compose.koinInject
 
 @Composable
-fun MainTopbar (context : Context) {
+fun MainTopbar (context : Context, navController: NavController) {
     val socketManager = koinInject<WebsocketManager>()
     val socketIsConnected by socketManager.socketListener.isConnectedLive.observeAsState()
     var programmingMode by remember { mutableStateOf(false) }
@@ -87,8 +88,11 @@ fun MainTopbar (context : Context) {
     }
 
     if (connectionStatusDialogVisible) {
-        ConnectionStatusDialog {
-            connectionStatusDialogVisible = it
-        }
+        ConnectionStatusDialog (
+            navController = navController,
+            setShowDialog = {
+                connectionStatusDialogVisible = it
+            }
+        )
     }
 }

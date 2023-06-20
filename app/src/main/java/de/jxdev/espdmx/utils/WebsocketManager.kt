@@ -8,26 +8,32 @@ import okhttp3.Request
 import okhttp3.Response
 import okhttp3.WebSocket
 import okhttp3.WebSocketListener
+import org.koin.compose.koinInject
 import java.net.InetAddress
 import java.util.Timer
 import java.util.TimerTask
 
 class WebsocketManager (context : Context) {
+    val socketLog = SocketLog()
     private val logTag = "WebsocketListener"
 
     private val client = OkHttpClient()
     private var socketAddress : InetAddress? = null
     private var socketUrl : String? = null
-    val socketListener = WebSocketListener(this)
+    val socketListener = WebSocketListener(this, socketLog)
     var socket : WebSocket? = null
     fun setAddress(address: InetAddress) {
         socketAddress = address
         socketUrl = "ws://${socketAddress?.hostAddress.toString()}/ws"
     }
+    fun getSocketUrl(): String? {
+        return socketUrl
+    }
 
     fun connect() {
         if (socketUrl == null) {
             Log.e(logTag,"Cannot Connect to WebSocket, address not set!")
+            socketLog.log("Cannot Connect to WebSocket, address not set!")
             return
         }
         /*
@@ -44,6 +50,7 @@ class WebsocketManager (context : Context) {
     fun disconnect() {
         if (socket == null) {
             Log.e(logTag, "Cannot disconnect from Socket, socket is not connected!")
+            socketLog.log("Cannot disconnect from WebSocket, not connected!")
             return
         }
 
@@ -51,7 +58,7 @@ class WebsocketManager (context : Context) {
     }
 }
 
-class WebSocketListener (private val socketManager: WebsocketManager) : WebSocketListener(){
+class WebSocketListener (private val socketManager: WebsocketManager, private val socketLog : SocketLog) : WebSocketListener(){
     private val logTag = "WebsocketListener"
     var isConnectedLive = MutableLiveData(false)
     var isAlive = false
@@ -67,6 +74,7 @@ class WebSocketListener (private val socketManager: WebsocketManager) : WebSocke
     override fun onOpen(webSocket: WebSocket, response: Response) {
         super.onOpen(webSocket, response)
         Log.d(logTag, "onOpen:")
+        socketLog.log("Connection Opened to " + socketManager.getSocketUrl())
 
         setIsConnected(true)
     }
@@ -74,6 +82,7 @@ class WebSocketListener (private val socketManager: WebsocketManager) : WebSocke
     override fun onMessage(webSocket: WebSocket, text: String) {
         super.onMessage(webSocket, text)
         Log.d(logTag, "onMessage: $text")
+        socketLog.log("Message: $text")
 
         lastAliveTick = System.currentTimeMillis()
     }
@@ -86,6 +95,7 @@ class WebSocketListener (private val socketManager: WebsocketManager) : WebSocke
     override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
         super.onClosed(webSocket, code, reason)
         Log.d(logTag, "onClosed: $code $reason")
+        socketLog.log("Connection closed: Code: $code, Reason: $reason")
 
 
         setIsConnected(false)
@@ -93,6 +103,7 @@ class WebSocketListener (private val socketManager: WebsocketManager) : WebSocke
         // Attempt reconnect when error
         if (code != 1000 && reason != "Disconnect") {
             Log.e(logTag, "Websocket Connect closed unexpectedly, reconnecting...")
+            socketLog.log("Connection closed unexpectedly, reconnecting...")
             socketManager.connect()
         }
 
@@ -107,6 +118,7 @@ class WebSocketListener (private val socketManager: WebsocketManager) : WebSocke
 
         // Attempt reconnect when error
         Log.e(logTag, "Websocket FAIL ${t.message} $response, reconnecting...")
+        socketLog.log("Connection failed! Message: ${t.message} $response, reconnecting...")
         socketManager.connect()
 
     }
@@ -123,9 +135,11 @@ class WebSocketListener (private val socketManager: WebsocketManager) : WebSocke
 
                 if (oldAliveStatus != isAlive) {
                     Log.d(logTag,"Alive Status changed to $isAlive")
+                    socketLog.log("Alive status changed to $isAlive")
 
                     if (!isAlive) {
                         Log.e(logTag, "Websocket ALIVE signal failure, Attempting Reconnect...")
+                        socketLog.log("Alive signals missed, attempting reconnect...")
                         setIsConnected(false)
                         socketManager.connect()
                     }
