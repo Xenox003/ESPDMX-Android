@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import de.jxdev.espdmx.Screen
 import de.jxdev.espdmx.utils.WebsocketManager
 import org.koin.compose.koinInject
 
@@ -71,6 +72,28 @@ fun MainTopbar (context : Context, navController: NavController) {
             style = MaterialTheme.typography.bodySmall
         )
         Spacer(modifier = Modifier.weight(1f))
+        Box(
+            modifier = Modifier
+                .width(1.dp)
+                .fillMaxHeight()
+                .background(MaterialTheme.colorScheme.onSurfaceVariant)
+        )
+        TopbarButton(
+            active = navController.currentDestination?.route == Screen.ConfigScreen.route,
+            text = "Configuration",
+            onClick = {
+                val currentRoute = navController.currentDestination?.route
+                val targetRoute = Screen.ConfigScreen.route
+
+                if (currentRoute == targetRoute) {
+                    navController.navigate(Screen.MainScreen.route)
+                } else {
+                    navController.navigate(targetRoute)
+                }
+
+            }) {
+
+        }
         Box(
             modifier = Modifier
                 .width(1.dp)

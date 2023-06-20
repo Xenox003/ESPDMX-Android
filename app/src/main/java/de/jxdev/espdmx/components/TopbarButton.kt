@@ -24,7 +24,7 @@ fun TopbarButton (active: Boolean, text : String, onClick: () -> Unit, function:
         contentAlignment = Alignment.Center
     ) {
         Text(
-            text = "Program",
+            text = text,
             style = MaterialTheme.typography.bodySmall,
             color = if (active) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier
