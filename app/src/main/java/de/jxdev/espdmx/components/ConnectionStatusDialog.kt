@@ -15,10 +15,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -40,6 +44,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
+import de.jxdev.espdmx.R
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -92,6 +97,11 @@ fun ConnectionStatusDialog (setShowDialog: (Boolean) -> Unit, context : Context)
                         modifier = Modifier
                             .fillMaxWidth(0.75f)
                     )
+                    ActionWindow(
+                        modifier = Modifier
+                            .padding(start = 5.dp)
+                            .fillMaxWidth()
+                    )
                 }
             }
         }
@@ -122,18 +132,18 @@ fun WebsocketLogWindow (modifier: Modifier = Modifier) {
 
             ) {
                 items(40) {
-                    WebsocketLogEntry(text = "test")
+                    WebsocketLogEntry(text = "test test a b c d e f  g  d s a sd  f ew e dfefeq w efwe q s df  ef g rgwer wq ds reqf ef ewe ")
                 }
             }
-            if (listState.firstVisibleItemIndex > 10) {
+            if (listState.firstVisibleItemIndex > 5) {
                 Box(
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
                         .shadow(10.dp)
                         .offset((-5).dp, (-5).dp)
                         .padding(5.dp)
-                        .width(50.dp)
-                        .height(50.dp)
+                        .width(35.dp)
+                        .height(35.dp)
                         .background(MaterialTheme.colorScheme.surfaceVariant)
                         .clickable {
                             coroutineScope.launch {
@@ -142,7 +152,13 @@ fun WebsocketLogWindow (modifier: Modifier = Modifier) {
                         },
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(text = "DOWN")
+                    //Text(text = "DOWN")
+                    Icon(
+                        Icons.Filled.ArrowDropDown,
+                        "down",
+                        modifier = Modifier
+                            .size(35.dp)
+                    )
                 }
             }
         }
@@ -152,4 +168,41 @@ fun WebsocketLogWindow (modifier: Modifier = Modifier) {
 @Composable
 fun WebsocketLogEntry (text : String) {
     Text(text = text, fontFamily = FontFamily.Monospace, fontSize = 14.sp)
+}
+
+
+@Composable
+fun ActionWindow (modifier: Modifier = Modifier) {
+    Column (
+        modifier = modifier
+    ) {
+        Text(
+            text = "Actions",
+            modifier = Modifier
+                .padding(bottom = 5.dp)
+        )
+        ActionButton (
+            onClick = {
+                Log.d("TEST", "Test Action")
+            },
+            text = "Test Action"
+        )
+    }
+}
+
+@Composable
+fun ActionButton (onClick: () -> Unit,text: String, modifier: Modifier = Modifier) {
+    Box (
+        modifier = modifier
+            .background(Color.Gray)
+            .fillMaxWidth()
+            .height(50.dp)
+            .clickable {
+                onClick()
+            }
+            .padding(5.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(text = text)
+    }
 }
