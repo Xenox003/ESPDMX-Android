@@ -8,13 +8,12 @@ import okhttp3.Request
 import okhttp3.Response
 import okhttp3.WebSocket
 import okhttp3.WebSocketListener
-import org.koin.compose.koinInject
 import java.net.InetAddress
 import java.util.Timer
 import java.util.TimerTask
 
 class WebsocketManager (context : Context) {
-    val socketLog = SocketLog()
+    val socketLog = WebsocketLog()
     private val logTag = "WebsocketListener"
 
     private val client = OkHttpClient()
@@ -58,7 +57,7 @@ class WebsocketManager (context : Context) {
     }
 }
 
-class WebSocketListener (private val socketManager: WebsocketManager, private val socketLog : SocketLog) : WebSocketListener(){
+class WebSocketListener (private val socketManager: WebsocketManager, private val socketLog : WebsocketLog) : WebSocketListener(){
     private val logTag = "WebsocketListener"
     var isConnectedLive = MutableLiveData(false)
     var isAlive = false

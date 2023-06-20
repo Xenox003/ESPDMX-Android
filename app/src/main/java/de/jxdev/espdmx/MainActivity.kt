@@ -19,7 +19,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import de.jxdev.espdmx.ui.theme.ESPDMXTheme
 import de.jxdev.espdmx.utils.ServiceDiscoveryManager
-import de.jxdev.espdmx.utils.SocketLog
 import de.jxdev.espdmx.utils.WebsocketManager
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger

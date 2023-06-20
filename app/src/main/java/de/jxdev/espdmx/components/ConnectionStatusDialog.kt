@@ -1,8 +1,5 @@
 package de.jxdev.espdmx.components
 
-import android.os.Build
-import android.util.Log
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -28,9 +25,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -45,8 +39,6 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavController
 import de.jxdev.espdmx.Screen
-import de.jxdev.espdmx.utils.SocketLog
-import de.jxdev.espdmx.utils.SocketLogEntry
 import de.jxdev.espdmx.utils.WebsocketManager
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
