@@ -28,7 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import de.jxdev.espdmx.Screen
+import de.jxdev.espdmx.MainScreen
 import de.jxdev.espdmx.model.DiscoveredDevice
 import de.jxdev.espdmx.utils.ServiceDiscoveryManager
 import de.jxdev.espdmx.utils.WebsocketManager
@@ -37,7 +37,7 @@ import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 
 @Composable
-fun ConnectionScreen(navController: NavController, context: Context) {
+fun ConnectionScreen(mainNavController: NavController, context: Context) {
     val discoveryManagerState = remember { mutableStateOf(ServiceDiscoveryManager(context)) }
     val discoveryManager = discoveryManagerState.value
 
@@ -74,7 +74,7 @@ fun ConnectionScreen(navController: NavController, context: Context) {
                 .align(Alignment.TopStart)
                 .clickable {
                     Log.d("TEST", "Demo Mode")
-                    navController.navigate(Screen.MainScreen.route)
+                    mainNavController.navigate(MainScreen.DashboardScreen.route)
                 },
             contentAlignment = Alignment.Center
         ) {
@@ -95,7 +95,7 @@ fun ConnectionScreen(navController: NavController, context: Context) {
                     .verticalScroll(rememberScrollState())
             ) {
                 serviceList?.forEach { device ->
-                    DevicePanel(context = context, navController = navController, device = device)
+                    DevicePanel(context = context, mainNavController = mainNavController, device = device)
                 }
             }
         }
@@ -103,7 +103,7 @@ fun ConnectionScreen(navController: NavController, context: Context) {
 }
 
 @Composable
-fun DevicePanel(context: Context, navController: NavController, device: DiscoveredDevice) {
+fun DevicePanel(context: Context, mainNavController: NavController, device: DiscoveredDevice) {
     val coroutineScope = rememberCoroutineScope()
 
     val socketManager = koinInject<WebsocketManager>()
@@ -112,7 +112,7 @@ fun DevicePanel(context: Context, navController: NavController, device: Discover
         .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(2.dp))
         .fillMaxWidth()
         .clickable {
-            navController.navigate(Screen.MainScreen.route)
+            mainNavController.navigate(MainScreen.DashboardScreen.route)
             socketManager.setAddress(device.host!!)
             socketManager.connect()
             coroutineScope.launch {

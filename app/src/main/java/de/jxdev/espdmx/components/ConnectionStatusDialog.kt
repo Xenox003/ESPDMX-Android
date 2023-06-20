@@ -38,16 +38,18 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavController
-import de.jxdev.espdmx.Screen
+import de.jxdev.espdmx.MainScreen
 import de.jxdev.espdmx.utils.WebsocketManager
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun ConnectionStatusDialog (setShowDialog: (Boolean) -> Unit, navController: NavController) {
-
-
+fun ConnectionStatusDialog (
+    setShowDialog: (Boolean) -> Unit,
+    mainNavController: NavController,
+    dashboardNavController: NavController
+) {
     Dialog(
         properties = DialogProperties(
             usePlatformDefaultWidth = false
@@ -58,7 +60,7 @@ fun ConnectionStatusDialog (setShowDialog: (Boolean) -> Unit, navController: Nav
     ) {
         Surface(
             modifier = Modifier
-                .fillMaxSize(0.7f),
+                .fillMaxSize(0.8f),
             shape = RoundedCornerShape(5.dp),
             color = MaterialTheme.colorScheme.surfaceVariant
         ) {
@@ -97,7 +99,7 @@ fun ConnectionStatusDialog (setShowDialog: (Boolean) -> Unit, navController: Nav
                         modifier = Modifier
                             .padding(start = 5.dp)
                             .fillMaxWidth(),
-                        navController = navController,
+                        mainNavController = mainNavController,
                         setShowDialog = setShowDialog
                     )
                 }
@@ -173,7 +175,11 @@ fun WebsocketLogEntry (text : String) {
 
 
 @Composable
-fun ActionWindow (modifier: Modifier = Modifier, navController: NavController, setShowDialog: (Boolean) -> Unit) {
+fun ActionWindow (
+    modifier: Modifier = Modifier,
+    mainNavController: NavController,
+    setShowDialog: (Boolean) -> Unit
+) {
     val socketManager = koinInject<WebsocketManager>()
 
     Column (
@@ -187,7 +193,7 @@ fun ActionWindow (modifier: Modifier = Modifier, navController: NavController, s
         ActionButton (
             onClick = {
                 setShowDialog(false)
-                navController.navigate(Screen.ConnectionScreen.route)
+                mainNavController.navigate(MainScreen.ConnectionScreen.route)
             },
             text = "To Connection Screen"
         )

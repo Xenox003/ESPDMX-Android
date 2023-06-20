@@ -27,12 +27,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import de.jxdev.espdmx.Screen
+import de.jxdev.espdmx.screen.DashboardPage
 import de.jxdev.espdmx.utils.WebsocketManager
 import org.koin.compose.koinInject
 
 @Composable
-fun MainTopbar (context : Context, navController: NavController) {
+fun MainTopbar (
+    context : Context,
+    mainNavController: NavController,
+    dashboardNavController: NavController
+) {
     val socketManager = koinInject<WebsocketManager>()
     val socketIsConnected by socketManager.socketListener.isConnectedLive.observeAsState()
     var programmingMode by remember { mutableStateOf(false) }
@@ -79,16 +83,16 @@ fun MainTopbar (context : Context, navController: NavController) {
                 .background(MaterialTheme.colorScheme.onSurfaceVariant)
         )
         TopbarButton(
-            active = navController.currentDestination?.route == Screen.ConfigScreen.route,
+            active = dashboardNavController.currentDestination?.route == DashboardPage.ConfigPage.route,
             text = "Configuration",
             onClick = {
-                val currentRoute = navController.currentDestination?.route
-                val targetRoute = Screen.ConfigScreen.route
+                val currentRoute = dashboardNavController.currentDestination?.route
+                val targetRoute = DashboardPage.ConfigPage.route
 
                 if (currentRoute == targetRoute) {
-                    navController.navigate(Screen.MainScreen.route)
+                    dashboardNavController.navigate(DashboardPage.MainPage.route)
                 } else {
-                    navController.navigate(targetRoute)
+                    dashboardNavController.navigate(targetRoute)
                 }
 
             }) {
@@ -112,7 +116,8 @@ fun MainTopbar (context : Context, navController: NavController) {
 
     if (connectionStatusDialogVisible) {
         ConnectionStatusDialog (
-            navController = navController,
+            mainNavController = mainNavController,
+            dashboardNavController = dashboardNavController,
             setShowDialog = {
                 connectionStatusDialogVisible = it
             }

@@ -16,7 +16,12 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 
 @Composable
-fun DashboardScreenBase (navController: NavController, context: Context,content: @Composable() () -> Unit) {
+fun DashboardLayout (
+    mainNavController: NavController,
+    dashboardNavController : NavController,
+    context: Context,
+    content: @Composable () -> Unit
+) {
     Box(
         modifier = Modifier
             .fillMaxSize(),
@@ -34,12 +39,11 @@ fun DashboardScreenBase (navController: NavController, context: Context,content:
                     .background(MaterialTheme.colorScheme.surfaceVariant)
             ) {
                 // TOPBAR
-                MainTopbar(context, navController = navController)
+                MainTopbar(context, mainNavController = mainNavController, dashboardNavController = dashboardNavController)
             }
 
-            content()
             // CONTENT
-
+            content()
         }
     }
 }
