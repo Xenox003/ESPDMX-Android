@@ -1,7 +1,6 @@
 package de.jxdev.espdmx.components
 
 import android.content.Context
-import android.util.Log
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
@@ -88,11 +87,8 @@ fun MainTopbar (context : Context) {
     }
 
     if (connectionStatusDialogVisible) {
-        ConnectionStatusDialog (
-            setShowDialog = {
-                connectionStatusDialogVisible = it
-            },
-            context = context
-        )
+        ConnectionStatusDialog {
+            connectionStatusDialogVisible = it
+        }
     }
 }
