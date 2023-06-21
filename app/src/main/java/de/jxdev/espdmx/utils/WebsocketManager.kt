@@ -3,6 +3,10 @@ package de.jxdev.espdmx.utils
 import android.content.Context
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
+import com.google.gson.GsonBuilder
+import de.jxdev.espdmx.model.websocket.Command
+import de.jxdev.espdmx.utils.serialization.CommandDeserializer
+import de.jxdev.espdmx.utils.serialization.CommandSerializer
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
@@ -63,6 +67,11 @@ class WebSocketListener (private val socketManager: WebsocketManager, private va
     var isAlive = false
     private var lastAliveTick : Long = 0
 
+    private val gson = GsonBuilder()
+        .registerTypeAdapter(Command::class.java,CommandSerializer())
+        .registerTypeAdapter(Command::class.java,CommandDeserializer())
+        .create()
+
     private fun setIsConnected(isConnected : Boolean) {
         isConnectedLive.postValue(isConnected)
     }
@@ -80,8 +89,11 @@ class WebSocketListener (private val socketManager: WebsocketManager, private va
 
     override fun onMessage(webSocket: WebSocket, text: String) {
         super.onMessage(webSocket, text)
-        Log.d(logTag, "onMessage: $text")
+        //Log.d(logTag, "onMessage: $text")
         socketLog.log("Message: $text")
+
+        val parsedCmd = gson.fromJson(text, Command::class.java)
+        Log.d("Socket",parsedCmd.toString())
 
         lastAliveTick = System.currentTimeMillis()
     }
