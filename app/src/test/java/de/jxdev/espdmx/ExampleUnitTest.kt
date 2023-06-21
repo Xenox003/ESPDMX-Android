@@ -4,6 +4,7 @@ import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import de.jxdev.espdmx.model.websocket.Command
+import de.jxdev.espdmx.model.websocket.client.ChannelType
 import de.jxdev.espdmx.model.websocket.client.CreateFixtureCommandArgs
 import de.jxdev.espdmx.utils.CommandDeserializer
 import de.jxdev.espdmx.utils.CommandSerializer
@@ -28,12 +29,25 @@ class ExampleUnitTest {
         val testJson = """
             {
                 "base_command": "CREATE",
-                "sub_command": "FIXTURE",
+                "sub_command": "SEQUENCE",
                 "args" : {
-                    "name": "TestFixture",
-                    "channelCount": 4,
-                    "channelNames": ["Brightness","R","G","B"],
-                    "channelTypes": ["BARE","COLOR_R", "COLOR_G", "COLOR_B"]
+                    "name": "TestSequence",
+                    "cues": [
+                        {
+                            "id": 0,
+                            "name": "TestCue0",
+                            "type": "CH",
+                            "values": [255,0,255],
+                            "meta": [1,5,7]
+                        },
+                        {
+                            "id": 1,
+                            "name": "TestCue1",
+                            "type": "CH",
+                            "values": [0,255,0],
+                            "meta": [1,5,7]
+                        }
+                    ]
                 }
             }
         """.trimIndent()
@@ -53,7 +67,7 @@ class ExampleUnitTest {
             subCommand = "FIXTURE",
             args = CreateFixtureCommandArgs(
                 channelNames = arrayListOf("test"),
-                channelTypes = arrayListOf("BARE"),
+                channelTypes = arrayListOf(ChannelType.BARE),
                 name = "TestFixture",
                 channelCount = 1
             )
