@@ -5,7 +5,7 @@ import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
 import de.jxdev.espdmx.model.websocket.Command
 import de.jxdev.espdmx.model.websocket.CommandType
-import de.jxdev.espdmx.model.websocket.CommandArg
+import de.jxdev.espdmx.model.websocket.CommandArgs
 import java.lang.reflect.Type
 
 class CommandDeserializer : JsonDeserializer<Command> {
@@ -22,7 +22,7 @@ class CommandDeserializer : JsonDeserializer<Command> {
         if (args == null || baseCommand == null || subCommand == null) return Command()
 
         val argClassType = getArgClass(baseCommand.toString(), subCommand.toString())
-        val argBody = context?.deserialize<CommandArg>(args, argClassType?.argBody ?: CommandArg::class.java)
+        val argBody = context?.deserialize<CommandArgs>(args, argClassType?.argBody ?: CommandArgs::class.java)
 
         return Command(
             baseCommand = baseCommand.toString(),
