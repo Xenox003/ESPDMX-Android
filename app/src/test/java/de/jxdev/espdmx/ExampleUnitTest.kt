@@ -1,17 +1,14 @@
 package de.jxdev.espdmx
 
-import android.util.Log
-import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import de.jxdev.espdmx.model.websocket.Command
-import de.jxdev.espdmx.model.websocket.client.ChannelType
 import de.jxdev.espdmx.model.websocket.client.CreateFixtureCommandArgs
-import de.jxdev.espdmx.utils.CommandDeserializer
-import de.jxdev.espdmx.utils.CommandSerializer
+import de.jxdev.espdmx.model.websocket.client.enums.ChannelType
+import de.jxdev.espdmx.utils.serialization.CommandDeserializer
+import de.jxdev.espdmx.utils.serialization.CommandSerializer
 import org.junit.Test
 
 import org.junit.Assert.*
-import kotlin.reflect.typeOf
 
 /**
  * Example local unit test, which will execute on the development machine (host).

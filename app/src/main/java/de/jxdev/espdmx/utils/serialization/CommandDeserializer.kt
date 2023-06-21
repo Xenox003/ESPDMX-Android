@@ -1,4 +1,4 @@
-package de.jxdev.espdmx.utils
+package de.jxdev.espdmx.utils.serialization
 
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
@@ -30,11 +30,5 @@ class CommandDeserializer : JsonDeserializer<Command> {
             args = argBody
         )
 
-    }
-}
-
-fun getArgClass(baseCommand : String, subCommand : String) : CommandType? {
-    return CommandType.values().firstOrNull() {
-        it.baseCommand == baseCommand && it.subCommand == subCommand
     }
 }
