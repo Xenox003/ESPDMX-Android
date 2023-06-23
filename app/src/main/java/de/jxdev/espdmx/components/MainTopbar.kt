@@ -1,6 +1,7 @@
 package de.jxdev.espdmx.components
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
@@ -41,6 +42,9 @@ fun MainTopbar (
     val socketIsConnected by socketManager.socketListener.isConnectedLive.observeAsState()
     var programmingMode by remember { mutableStateOf(false) }
     var connectionStatusDialogVisible by remember { mutableStateOf(false) }
+
+    val currentRoute : String? = dashboardNavController.currentDestination?.route
+    Log.d("TEST",currentRoute.toString())
 
     val flashAnimation by rememberInfiniteTransition().animateFloat(
         initialValue = 1f,
@@ -83,10 +87,9 @@ fun MainTopbar (
                 .background(MaterialTheme.colorScheme.onSurfaceVariant)
         )
         TopbarButton(
-            active = dashboardNavController.currentDestination?.route == DashboardPage.ConfigPage.route,
+            active = currentRoute == DashboardPage.ConfigPage.route,
             text = "Configuration",
             onClick = {
-                val currentRoute = dashboardNavController.currentDestination?.route
                 val targetRoute = DashboardPage.ConfigPage.route
 
                 if (currentRoute == targetRoute) {
