@@ -4,9 +4,9 @@ import android.content.Context
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.GsonBuilder
-import de.jxdev.espdmx.model.websocket.Command
-import de.jxdev.espdmx.utils.serialization.CommandDeserializer
-import de.jxdev.espdmx.utils.serialization.CommandSerializer
+import de.jxdev.espdmx.lib.serialization.CommandDeserializer
+import de.jxdev.espdmx.lib.serialization.CommandSerializer
+import de.jxdev.espdmx.lib.websocket.Command
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response

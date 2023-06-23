@@ -1,11 +1,11 @@
 package de.jxdev.espdmx
 
 import com.google.gson.GsonBuilder
-import de.jxdev.espdmx.model.websocket.Command
-import de.jxdev.espdmx.model.websocket.client.CreateFixtureCommandArgs
-import de.jxdev.espdmx.model.websocket.client.enums.ChannelType
-import de.jxdev.espdmx.utils.serialization.CommandDeserializer
-import de.jxdev.espdmx.utils.serialization.CommandSerializer
+import de.jxdev.espdmx.lib.serialization.CommandDeserializer
+import de.jxdev.espdmx.lib.serialization.CommandSerializer
+import de.jxdev.espdmx.lib.websocket.Command
+import de.jxdev.espdmx.lib.websocket.client.CreateFixtureCommandArgs
+import de.jxdev.espdmx.lib.websocket.enums.ChannelType
 import org.junit.Test
 
 import org.junit.Assert.*
